@@ -59,11 +59,11 @@ jobs:
       working-directory: FilmEffect
       run: |
         set -e
-        xcodebuild clean -project FilmEffectApp.xcodeproj -scheme FilmEffectApp -configuration Release
+        xcodebuild clean -project FilmEffect.xcodeproj -scheme FilmEffect -configuration Release
         xcodebuild \
           -quiet \
-          -project FilmEffectApp.xcodeproj \
-          -scheme FilmEffectApp \
+          -project FilmEffect.xcodeproj \
+          -scheme FilmEffect \
           -sdk iphoneos \
           -configuration Release \
           -archivePath $PWD/build/FilmEffect.xcarchive \
