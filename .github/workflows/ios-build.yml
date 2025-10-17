@@ -56,12 +56,11 @@ jobs:
 
     # 6. アーカイブ作成（Ad-Hoc）
     - name: Build archive
-      working-directory: FilmEffect
       run: |
-        set -e
+        cd FilmEffect
+        ls -al  # ← デバッグのため追加：ここで xcodeproj の存在を確認
         xcodebuild clean -project FilmEffect.xcodeproj -scheme FilmEffect -configuration Release
         xcodebuild \
-          -quiet \
           -project FilmEffect.xcodeproj \
           -scheme FilmEffect \
           -sdk iphoneos \
@@ -73,6 +72,7 @@ jobs:
           PROVISIONING_PROFILE_SPECIFIER="FilmEffect_AdHoc_Profile" \
           DEVELOPMENT_TEAM="${{ secrets.TEAM_ID }}"
 
+  
     # 7. .ipa にエクスポート
     - name: Export IPA
       working-directory: FilmEffect
