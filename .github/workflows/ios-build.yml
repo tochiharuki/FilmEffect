@@ -116,12 +116,12 @@ jobs:
         MYIOSAPP_REPO: https://x-access-token:${{ secrets.REPO_PUSH_TOKEN }}@github.com/tochiharuki/MyiOSApp.git
       run: |
         set -e
-        git remote set-url myiosapp $MYIOSAPP_REPO || git remote add myiosapp $MYIOSAPP_REPO
+        git remote set-url MyiOSApp $MYIOSAPP_REPO || git remote add MyiOSApp $MYIOSAPP_REPO
         git remote remove myiosapp || true
-        git remote add myiosapp $MYIOSAPP_REPO
+        git remote add MyiOSApp $MYIOSAPP_REPO
         git remote -v
         git config user.name "${GIT_AUTHOR_NAME}"
         git config user.email "${GIT_AUTHOR_EMAIL}"
         git add static
         git commit -m "Deploy FilmEffect build [skip ci]" || echo "No changes to commit"
-        git push myiosapp main --force
+        git push MyiOSApp main --force
