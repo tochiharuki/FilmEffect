@@ -90,17 +90,26 @@ jobs:
         name: FilmEffect-ipa
         path: build/*.ipa   # ← ✅ ここ変更！
 
-    # 9. Render 配布用 static/ にコピー
-    - name: Prepare static directory
+    # 9. Render 配布用 static/ にコピー & MyiOSAppにpush
+    - name: Push FilmEffect build to MyiOSApp repo
+      env:
+        GIT_AUTHOR_NAME: github-actions
+        GIT_AUTHOR_EMAIL: github-actions@github.com
+        MYIOSAPP_REPO: https://x-access-token:${{ secrets.REPO_PUSH_TOKEN }}@github.com/tochiharuki/MyiOSApp.git
       run: |
+        set -e
+        echo "Cloning MyiOSApp repository..."
+        git clone $MYIOSAPP_REPO MyiOSApp-temp
+        cd MyiOSApp-temp
         mkdir -p static
-        cp build/*.ipa static/ || echo "No ipa to copy"
-        if [ -f Manifest.plist ]; then
-          cp Manifest.plist static/
-        fi
-        if [ -f index.html ]; then
-          cp index.html static/
-        fi
+        echo "Copying build artifacts..."
+        cp -r ../FilmEffect/static/* static/
+        git config user.name "${GIT_AUTHOR_NAME}"
+        git config user.email "${GIT_AUTHOR_EMAIL}"
+        git add static
+        git commit -m "Update static site from FilmEffect build [skip ci]" || echo "No changes to commit"
+        git push origin main
+
 
     # 10. static/ をコミット & Push
     - name: Commit and push static files
@@ -111,7 +120,7 @@ jobs:
         set -e
         git config user.name "${GIT_AUTHOR_NAME}"
         git config user.email "${GIT_AUTHOR_EMAIL}"
-        echo "----- Static directory contents -----"
+        echo "----- Static directory contents -----"  
         ls -al static || true
         git add static || true
         git commit -m "Deploy ipa to static for Render (Ad-Hoc build) [skip ci]" || echo "No changes to commit"
