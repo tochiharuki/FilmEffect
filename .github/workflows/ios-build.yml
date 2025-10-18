@@ -90,7 +90,7 @@ jobs:
         name: FilmEffect-ipa
         path: build/*.ipa   # ← ✅ ここ変更！
 
-    # 9. Render 配布用 static/ にコピー
+    # 9. Render 配布用static/ にコピー
     - name: Prepare static directory
       run: |
         mkdir -p static
