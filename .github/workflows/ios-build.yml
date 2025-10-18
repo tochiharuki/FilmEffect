@@ -109,8 +109,11 @@ jobs:
         GIT_AUTHOR_EMAIL: github-actions@github.com
       run: |
         set -e
+        cd $GITHUB_WORKSPACE   # ← ルートに戻す
         git config user.name "${GIT_AUTHOR_NAME}"
         git config user.email "${GIT_AUTHOR_EMAIL}"
+        echo "----- Static directory contents -----"
+        ls -al FilmEffect/static || true
         git add FilmEffect/static || true
         git commit -m "Deploy ipa to static for Render (Ad-Hoc build) [skip ci]" || echo "No changes to commit"
-        git push origin main || echo "Push failed (maybe permissions)"
+        git push origin HEAD:main || echo "Push failed (maybe permissions)"
