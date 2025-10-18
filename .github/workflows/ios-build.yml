@@ -83,7 +83,7 @@ jobs:
         echo "Contents of build directory:"
         ls -al build || true
 
-    # 8. .ipa を Artifact としてアップロード
+    # 8. .ipa をArtifact としてアップロード
     - name: Upload IPA artifact
       uses: actions/upload-artifact@v4
       with:
