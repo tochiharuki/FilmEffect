@@ -116,6 +116,7 @@ jobs:
         MYIOSAPP_REPO: https://x-access-token:${{ secrets.REPO_PUSH_TOKEN }}@github.com/tochiharuki/MyiOSApp.git
       run: |
         set -e
+        git remote set-url myiosapp $MYIOSAPP_REPO || git remote add myiosapp $MYIOSAPP_REPO
         git remote remove myiosapp || true
         git remote add myiosapp $MYIOSAPP_REPO
         git remote -v
