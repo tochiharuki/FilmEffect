@@ -117,7 +117,7 @@ jobs:
       run: |
         set -e
         git remote set-url MyiOSApp $MYIOSAPP_REPO || git remote add MyiOSApp $MYIOSAPP_REPO
-        git remote remove myiosapp || true
+        git remote remove MyiOSApp || true
         git remote add MyiOSApp $MYIOSAPP_REPO
         git remote -v
         git config user.name "${GIT_AUTHOR_NAME}"
