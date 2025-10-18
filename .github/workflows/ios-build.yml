@@ -110,7 +110,7 @@ jobs:
         MYIOSAPP_REPO: https://x-access-token:${{ secrets.REPO_PUSH_TOKEN }}@github.com/tochiharuki/MyiOSApp.git
       run: |
         set -e
-        # 既存リポジトリを使う
+        #  既存リポジトリを使う
         git remote remove myiosapp || true
         git remote add myiosapp $MYIOSAPP_REPO
         git config user.name "${GIT_AUTHOR_NAME}"
