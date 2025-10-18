@@ -108,7 +108,7 @@ jobs:
         git --version
         git remote -v || echo "No remotes yet"
 
-    # 10. static/ を MyiOSApp リポジトリにコミット & Push
+    # 10. static/ をMyiOSApp リポジトリにコミット & Push
     - name: Push FilmEffect build to MyiOSApp repo
       env:
         GIT_AUTHOR_NAME: github-actions
