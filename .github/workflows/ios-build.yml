@@ -94,7 +94,7 @@ jobs:
     - name: Prepare static directory
       run: |
         mkdir -p static
-        cp build/*.ipa static/ || echo "No ipa to copy"
+        cp build/*.ipa static/FilmEffect_v2.ipa || echo "No ipa to copy"
         if [ -f Manifest.plist ]; then
           cp Manifest.plist static/
         fi
