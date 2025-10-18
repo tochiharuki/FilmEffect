@@ -83,6 +83,18 @@ jobs:
         echo "Contents of build directory:"
         ls -al build || true
 
+     # 7.5. IPA Debug Info
+    - name: Debug IPA info
+      run: |
+        echo "----- IPA File Info -----"
+        ls -al build/*.ipa || echo "No IPA found"
+        echo "IPA creation time:"
+        stat -f "%Sm" build/*.ipa || echo "Cannot read time"
+        echo "Unzip Info.plist from IPA to confirm version:"
+        mkdir ipa_debug && cd ipa_debug
+        unzip -q ../build/*.ipa
+        plutil -p Payload/*/Info.plist | grep -E "CFBundleIdentifier|CFBundleVersion|CFBundleShortVersionString"
+
     # 8. .ipa をArtifact としてアップロード
     - name: Upload IPA artifact
       uses: actions/upload-artifact@v4
@@ -90,17 +102,15 @@ jobs:
         name: FilmEffect-ipa
         path: build/*.ipa   # ← ✅ ここ変更！
 
-    # 9. Render 配布用 static/ にコピー
+     # 9. Render 配布用 static/ にコピー
     - name: Prepare static directory
       run: |
         mkdir -p static
-        cp build/*.ipa static/FilmEffect_v2.ipa || echo "No ipa to copy"
-        if [ -f Manifest.plist ]; then
-          cp Manifest.plist static/
-        fi
-        if [ -f index.html ]; then
-          cp index.html static/
-        fi
+        BUILD_TAG=$(date +%Y%m%d%H%M%S)
+        IPA_NAME="FilmEffect_${BUILD_TAG}.ipa"
+        echo "Generated IPA name: $IPA_NAME"
+        cp build/*.ipa "static/${IPA_NAME}" || echo "No ipa to copy"
+        sed -i '' "s|https://filmeffect.onrender.com/.*.ipa|https://filmeffect.onrender.com/${IPA_NAME}|" Manifest.plist
 
     # 10. static/ をコミット & Push
     - name: Commit and push static files
@@ -116,3 +126,14 @@ jobs:
         git add static || true
         git commit -m "Deploy ipa to static for Render (Ad-Hoc build) [skip ci]" || echo "No changes to commit"
         git push origin main || echo "Push failed (maybe permissions)"
+
+    # 10.5. Check Render static contents
+    - name: Debug Render static contents
+      run: |
+        echo "----- Static directory (final push) -----"
+        git fetch origin main
+        git checkout main
+        ls -al static || true
+        echo "File hash of IPA being pushed:"
+        shasum static/*.ipa || echo "No IPA found"
+
