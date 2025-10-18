@@ -92,18 +92,18 @@ jobs:
 
     # 9. Render 配布用 static/ にコピー
     - name: Prepare static directory
-      working-directory: FilmEffect  # ← FilmEffect 内で操作する
       run: |
-        mkdir -p static
-        cp build/*.ipa static/ || echo "No ipa to copy"
-        [ -f Manifest.plist ] && cp Manifest.plist static/
-        [ -f index.html ] && cp index.html static/
-        echo "----- Static directory contents -----"
-        ls -al static
+        mkdir -p FilmEffect/static
+        cp FilmEffect/build/*.ipa FilmEffect/static/ || echo "No ipa to copy"
+        if [ -f FilmEffect/Manifest.plist ]; then
+          cp FilmEffect/Manifest.plist FilmEffect/static/
+        fi
+        if [ -f FilmEffect/index.html ]; then
+          cp FilmEffect/index.html FilmEffect/static/
+        fi
 
     # 10. static/ をコミット & Push
     - name: Commit and push static files
-      working-directory: FilmEffect  # ← FilmEffect 内で git add する
       env:
         GIT_AUTHOR_NAME: github-actions
         GIT_AUTHOR_EMAIL: github-actions@github.com
@@ -111,9 +111,6 @@ jobs:
         set -e
         git config user.name "${GIT_AUTHOR_NAME}"
         git config user.email "${GIT_AUTHOR_EMAIL}"
-        echo "----- Checking git status -----"
-        git status
-        git add static
+        git add FilmEffect/static || true
         git commit -m "Deploy ipa to static for Render (Ad-Hoc build) [skip ci]" || echo "No changes to commit"
-        git push origin HEAD:main || echo "Push failed (maybe permissions)"
-
+        git push origin main || echo "Push failed (maybe permissions)"
