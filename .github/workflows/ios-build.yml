@@ -33,7 +33,7 @@ jobs:
         mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
         echo "$MOBILEPROVISION" | base64 --decode > ~/Library/MobileDevice/Provisioning\ Profiles/FilmEffect_AdHoc.mobileprovision
       env:
-        MOBILEPROVISION: ${{ secrets.MOBILEPROVISION }}
+        MOBILEPROVISION: ${{ secrets.PROVISIONING_PROFILE }}
 
     # 4. 証明書を Keychain にインポート
     - name: Import certificate to keychain
