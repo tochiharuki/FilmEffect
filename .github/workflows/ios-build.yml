@@ -35,7 +35,7 @@ jobs:
       env:
         MOBILEPROVISION: ${{ secrets.PROVISIONING_PROFILE }}
 
-    # 4. 証明書を Keychainにインポート
+    # 4. 証明書を Keychain にインポート
     - name: Import certificate to keychain
       run: |
         echo "$CERTIFICATE" | base64 --decode > /tmp/certificate.p12
