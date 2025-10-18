@@ -74,7 +74,6 @@ jobs:
   
     # 7. .ipa にエクスポート
     - name: Export IPA
-      working-directory: FilmEffect
       run: |
         set -e
         xcodebuild -exportArchive \
