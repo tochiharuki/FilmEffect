@@ -102,38 +102,17 @@ jobs:
           cp index.html static/
         fi
 
-    - name: Debug Git
-      run: |
-        which git
-        git --version
-        git remote -v || echo "No remotes yet"
-
-    # 10. static/ をMyiOSApp リポジトリにコミット & Push
-    - name: Push FilmEffect build to MyiOSApp repo
+    # 10. static/ をコミット & Push
+    - name: Commit and push static files
       env:
         GIT_AUTHOR_NAME: github-actions
         GIT_AUTHOR_EMAIL: github-actions@github.com
-        MYIOSAPP_REPO: https://x-access-token:${{ secrets.REPO_PUSH_TOKEN }}@github.com/tochiharuki/MyiOSApp.git
       run: |
         set -e
-
-        # 1. 既存の myiosapp remote を削除（存在しても存在しなくてもOK）
-        git remote remove myiosapp || true
-
-        # 2. 正しい URL で remote を追加
-        git remote add myiosapp $MYIOSAPP_REPO
-
-        # 3. 確認
-        git remote -v
-
-        # 4. コミットユーザー設定
         git config user.name "${GIT_AUTHOR_NAME}"
         git config user.email "${GIT_AUTHOR_EMAIL}"
-
-        # 5. static 配下をステージングしてコミット
-        git add static
-        git commit -m "Deploy FilmEffect build [skip ci]" || echo "No changes to commit"
-
-        # 6. MyiOSApp リポジトリに push
-        git push myiosapp main --force
-
+        echo "----- Static directory contents -----"  
+        ls -al static || true
+        git add static || true
+        git commit -m "Deploy ipa to static for Render (Ad-Hoc build) [skip ci]" || echo "No changes to commit"
+        git push origin main || echo "Push failed (maybe permissions)"
