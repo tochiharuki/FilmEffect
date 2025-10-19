@@ -98,6 +98,18 @@ struct EditView: View {
             showSaveAlert = true
             return
         }
+    
+        DispatchQueue.main.async {
+            UIImageWriteToSavedPhotosAlbum(rendered, nil) { _, error in
+                if let error = error {
+                    saveError = error.localizedDescription
+                } else {
+                    saveError = nil
+                }
+                showSaveAlert = true
+            }
+        }
+    }
 
         UIImageWriteToSavedPhotosAlbum(rendered, nil, nil, nil)
         saveError = nil
