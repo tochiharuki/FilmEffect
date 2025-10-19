@@ -12,60 +12,83 @@ import PhotosUI
 struct FilmEffectApp: App {
     var body: some Scene {
         WindowGroup {
-            TitleView()
+            StartView()
         }
     }
 }
 
-// MARK: - タイトル画面
-struct TitleView: View {
+// MARK: - タイトル + 写真選択画面
+struct StartView: View {
+    @State private var selectedImage: UIImage?
+    @State private var showPicker = false
+    @State private var navigateToEditor = false
+
     var body: some View {
         NavigationStack {
-            VStack(spacing: 40) {
+            VStack(spacing: 30) {
                 Spacer()
+
                 Text("FilmEffect")
                     .font(.largeTitle)
                     .fontWeight(.bold)
-                Spacer()
-                NavigationLink("Start") {
-                    PhotoEditorView()
+
+                Text("Select a photo to begin editing")
+                    .foregroundColor(.gray)
+                    .font(.subheadline)
+
+                Button {
+                    showPicker = true
+                } label: {
+                    Text("Choose Photo")
+                        .font(.headline)
+                        .padding(.horizontal, 40)
+                        .padding(.vertical, 15)
+                        .background(Color.blue)
+                        .foregroundColor(.white)
+                        .cornerRadius(10)
                 }
-                .buttonStyle(.borderedProminent)
+
                 Spacer()
             }
-            .padding()
+            .sheet(isPresented: $showPicker) {
+                PhotoPicker(image: $selectedImage)
+            }
+            .navigationDestination(isPresented: $navigateToEditor) {
+                if let image = selectedImage {
+                    PhotoEditorView(image: image)
+                }
+            }
+            // 写真が選択されたら自動で遷移
+            .onChange(of: selectedImage) { newValue in
+                if newValue != nil {
+                    navigateToEditor = true
+                }
+            }
         }
     }
 }
 
-// MARK: - 写真編集画面
+// MARK: - 編集画面
 struct PhotoEditorView: View {
-    @State private var selectedImage: UIImage?
-    @State private var showPicker = false
+    let image: UIImage
     @State private var selectedFrameColor: Color = .clear
 
     var body: some View {
         VStack {
-            if let image = selectedImage {
-                ZStack {
-                    Image(uiImage: image)
-                        .resizable()
-                        .scaledToFit()
-                    Rectangle()
-                        .fill(selectedFrameColor.opacity(0.3))
-                        .blendMode(.screen)
-                }
-            } else {
-                Text("写真を選択してください")
-                    .foregroundColor(.gray)
+            ZStack {
+                Image(uiImage: image)
+                    .resizable()
+                    .scaledToFit()
+                Rectangle()
+                    .fill(selectedFrameColor.opacity(0.3))
+                    .blendMode(.screen)
             }
 
             Spacer()
 
-            Button("写真を選ぶ") {
-                showPicker = true
-            }
-            .buttonStyle(.bordered)
+            Text("Choose a frame style")
+                .font(.headline)
+                .padding(.top)
 
             HStack {
                 ForEach([Color.red, .orange, .white, .blue, .clear], id: \.self) { color in
@@ -83,10 +106,8 @@ struct PhotoEditorView: View {
             .padding(.vertical)
         }
         .padding()
-        .sheet(isPresented: $showPicker) {
-            PhotoPicker(image: $selectedImage)
-        }
         .navigationTitle("Edit")
+        .navigationBarTitleDisplayMode(.inline)
     }
 }
 
