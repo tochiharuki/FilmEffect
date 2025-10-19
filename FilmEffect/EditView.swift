@@ -10,22 +10,23 @@ import SwiftUI
 struct EditView: View {
     let image: UIImage
     @State private var selectedFrame: String? = nil
-    
-    let frames = ["frame01", "frame02"] // アセット名
+    @State private var showSaveAlert = false
+    @State private var saveError: String? = nil
+
+    let frames = ["frame01", "frame02"]
 
     var body: some View {
         VStack {
             GeometryReader { geometry in
-                // 読み込んだ画像の縦横比を算出
                 let aspect = image.size.width / image.size.height
 
                 ZStack {
-                    // 背景の写真
+                    // 背景画像
                     Image(uiImage: image)
                         .resizable()
                         .aspectRatio(aspect, contentMode: .fit)
 
-                    // フレーム（画像と同じ比率で重ねる）
+                    // フレーム
                     if let frameName = selectedFrame {
                         Image(frameName)
                             .resizable()
@@ -33,12 +34,16 @@ struct EditView: View {
                             .allowsHitTesting(false)
                     }
                 }
-                // 画面中央に表示
                 .frame(width: geometry.size.width,
                        height: geometry.size.width / aspect)
                 .clipped()
                 .position(x: geometry.size.width / 2,
                           y: geometry.size.height / 2)
+                .background(
+                    GeometryReader { geo in
+                        Color.clear.preference(key: ImageFrameKey.self, value: geo.frame(in: .global))
+                    }
+                )
             }
             .padding()
 
@@ -62,8 +67,62 @@ struct EditView: View {
                 }
                 .padding(.horizontal)
             }
+
+            // ダウンロードボタン
+            Button(action: saveImageToPhotos) {
+                Label("Save to Photos", systemImage: "square.and.arrow.down")
+                    .font(.headline)
+                    .padding(.horizontal, 40)
+                    .padding(.vertical, 15)
+                    .background(Color.green)
+                    .foregroundColor(.white)
+                    .cornerRadius(10)
+            }
+            .padding(.top, 20)
         }
         .navigationTitle("Edit Photo")
         .navigationBarTitleDisplayMode(.inline)
+        .alert(isPresented: $showSaveAlert) {
+            if let error = saveError {
+                return Alert(title: Text("Error"), message: Text(error), dismissButton: .default(Text("OK")))
+            } else {
+                return Alert(title: Text("Saved!"), message: Text("Your edited photo has been saved."), dismissButton: .default(Text("OK")))
+            }
+        }
+    }
+
+    // MARK: - 保存処理
+    private func saveImageToPhotos() {
+        guard let rendered = renderCombinedImage() else {
+            saveError = "Failed to create image."
+            showSaveAlert = true
+            return
+        }
+
+        UIImageWriteToSavedPhotosAlbum(rendered, nil, nil, nil)
+        saveError = nil
+        showSaveAlert = true
+    }
+
+    // MARK: - 合成画像を生成
+    private func renderCombinedImage() -> UIImage? {
+        let renderer = UIGraphicsImageRenderer(size: image.size)
+        return renderer.image { context in
+            // 背景
+            image.draw(in: CGRect(origin: .zero, size: image.size))
+
+            // フレームを重ねる
+            if let frameName = selectedFrame, let overlay = UIImage(named: frameName) {
+                overlay.draw(in: CGRect(origin: .zero, size: image.size), blendMode: .normal, alpha: 1.0)
+            }
+        }
+    }
+}
+
+// MARK: - Geometry PreferenceKey（将来用）
+private struct ImageFrameKey: PreferenceKey {
+    static var defaultValue: CGRect = .zero
+    static func reduce(value: inout CGRect, nextValue: () -> CGRect) {
+        value = nextValue()
     }
 }
