@@ -55,7 +55,7 @@ struct StartView: View {
             }
             .navigationDestination(isPresented: $navigateToEditor) {
                 if let image = selectedImage {
-                    PhotoEditorView(image: image)
+                    EditView(image: image)
                 }
             }
             // 写真が選択されたら自動で遷移
@@ -69,45 +69,72 @@ struct StartView: View {
 }
 
 // MARK: - 編集画面
-struct PhotoEditorView: View {
-    let image: UIImage
-    @State private var selectedFrameColor: Color = .clear
-
+struct EditView: View {
+    @State private var selectedImage: UIImage?
+    @State private var selectedFrame: String? = nil
+    @State private var isPickerPresented = false
+    
+    let frames = ["frame01", "frame02"] // アセット名
+    
     var body: some View {
         VStack {
-            ZStack {
-                Image(uiImage: image)
-                    .resizable()
-                    .scaledToFit()
-                Rectangle()
-                    .fill(selectedFrameColor.opacity(0.3))
-                    .blendMode(.screen)
-            }
-
-            Spacer()
-
-            Text("Choose a frame style")
-                .font(.headline)
-                .padding(.top)
-
-            HStack {
-                ForEach([Color.red, .orange, .white, .blue, .clear], id: \.self) { color in
-                    Circle()
-                        .fill(color)
-                        .frame(width: 40, height: 40)
-                        .onTapGesture {
-                            selectedFrameColor = color
+            if let image = selectedImage {
+                ZStack {
+                    // 背景写真をアスペクトフィットで表示
+                    Image(uiImage: image)
+                        .resizable()
+                        .aspectRatio(contentMode: .fit)
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
+                        .clipped()
+                    
+                    // 選択中のフレーム画像を上に重ねる
+                    if let frameName = selectedFrame {
+                        Image(frameName)
+                            .resizable()
+                            .aspectRatio(contentMode: .fit)
+                            .frame(maxWidth: .infinity, maxHeight: .infinity)
+                            .allowsHitTesting(false) // タップを通す
+                    }
+                }
+                .padding()
+                
+                // フレーム選択ボタン
+                ScrollView(.horizontal, showsIndicators: false) {
+                    HStack(spacing: 16) {
+                        ForEach(frames, id: \.self) { frame in
+                            Button {
+                                selectedFrame = frame
+                            } label: {
+                                Image(frame)
+                                    .resizable()
+                                    .aspectRatio(contentMode: .fit)
+                                    .frame(width: 100, height: 100)
+                                    .overlay(
+                                        RoundedRectangle(cornerRadius: 8)
+                                            .stroke(selectedFrame == frame ? Color.blue : Color.clear, lineWidth: 2)
+                                    )
+                            }
                         }
-                        .overlay(
-                            Circle().stroke(Color.black.opacity(0.2), lineWidth: 1)
-                        )
+                    }
+                    .padding(.horizontal)
+                }
+            } else {
+                // 写真が未選択のとき
+                VStack(spacing: 20) {
+                    Text("FilmEffect")
+                        .font(.largeTitle)
+                        .bold()
+                    Button("Select Photo") {
+                        isPickerPresented = true
+                    }
+                    .buttonStyle(.borderedProminent)
                 }
             }
-            .padding(.vertical)
         }
-        .padding()
-        .navigationTitle("Edit")
-        .navigationBarTitleDisplayMode(.inline)
+        .photosPicker(isPresented: $isPickerPresented, selection: Binding.constant(nil), matching: .images)
+        .onChange(of: isPickerPresented) { _ in
+            // Picker終了後に選択された画像を処理（↓に処理追加する）
+        }
     }
 }
 
