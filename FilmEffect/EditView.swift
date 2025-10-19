@@ -15,26 +15,34 @@ struct EditView: View {
 
     var body: some View {
         VStack {
-            ZStack {
-                // 背景写真をアスペクトフィットで表示
-                Image(uiImage: image)
-                    .resizable()
-                    .aspectRatio(contentMode: .fit)
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
-                    .clipped()
+            GeometryReader { geometry in
+                // 読み込んだ画像の縦横比を算出
+                let aspect = image.size.width / image.size.height
 
-                // 選択中のフレーム画像を上に重ねる
-                if let frameName = selectedFrame {
-                    Image(frameName)
+                ZStack {
+                    // 背景の写真
+                    Image(uiImage: image)
                         .resizable()
-                        .aspectRatio(contentMode: .fit)
-                        .frame(maxWidth: .infinity, maxHeight: .infinity)
-                        .allowsHitTesting(false)
+                        .aspectRatio(aspect, contentMode: .fit)
+
+                    // フレーム（画像と同じ比率で重ねる）
+                    if let frameName = selectedFrame {
+                        Image(frameName)
+                            .resizable()
+                            .aspectRatio(aspect, contentMode: .fit)
+                            .allowsHitTesting(false)
+                    }
                 }
+                // 画面中央に表示
+                .frame(width: geometry.size.width,
+                       height: geometry.size.width / aspect)
+                .clipped()
+                .position(x: geometry.size.width / 2,
+                          y: geometry.size.height / 2)
             }
             .padding()
 
-            // フレーム選択ボタン
+            // フレーム選択ボタン群
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(spacing: 16) {
                     ForEach(frames, id: \.self) { frame in
