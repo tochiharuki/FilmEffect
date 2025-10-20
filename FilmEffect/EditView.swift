@@ -121,10 +121,6 @@ struct EditView: View {
         }
     }
 
-        UIImageWriteToSavedPhotosAlbum(rendered, nil, nil, nil)
-        saveError = nil
-        showSaveAlert = true
-    }
 
     // MARK: - 合成画像を生成
     private func renderCombinedImage() -> UIImage? {
