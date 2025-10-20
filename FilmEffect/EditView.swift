@@ -91,7 +91,7 @@ struct EditView: View {
         }
     }
 
-    // MARK: - 保存処理
+    // MARK: - 保存処理（コールバック付き）
     private func saveImageToPhotos() {
         guard let rendered = renderCombinedImage() else {
             saveError = "Failed to create image."
@@ -99,15 +99,13 @@ struct EditView: View {
             return
         }
     
-        DispatchQueue.main.async {
-            UIImageWriteToSavedPhotosAlbum(rendered, nil) { _, error in
-                if let error = error {
-                    saveError = error.localizedDescription
-                } else {
-                    saveError = nil
-                }
-                showSaveAlert = true
+        UIImageWriteToSavedPhotosAlbum(rendered, nil) { _, error in
+            if let error = error {
+                saveError = error.localizedDescription
+            } else {
+                saveError = nil
             }
+            showSaveAlert = true
         }
     }
 
