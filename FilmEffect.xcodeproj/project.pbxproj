@@ -17,7 +17,6 @@
 		88860A3C2EA53932006948EE /* StartView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 88860A3B2EA53932006948EE /* StartView.swift */; };
 		88860A3E2EA53964006948EE /* EditView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 88860A3D2EA53964006948EE /* EditView.swift */; };
 		88860A402EA53992006948EE /* PhotoPicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 88860A3F2EA53992006948EE /* PhotoPicker.swift */; };
-		88860A442EA5507A006948EE /* Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 88860A432EA5507A006948EE /* Info.plist */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -52,7 +51,7 @@
 		88860A3B2EA53932006948EE /* StartView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StartView.swift; sourceTree = "<group>"; };
 		88860A3D2EA53964006948EE /* EditView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditView.swift; sourceTree = "<group>"; };
 		88860A3F2EA53992006948EE /* PhotoPicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotoPicker.swift; sourceTree = "<group>"; };
-		88860A432EA5507A006948EE /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		88860A452EA554C5006948EE /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -83,7 +82,6 @@
 		88860A002EA0DF5C006948EE = {
 			isa = PBXGroup;
 			children = (
-				88860A432EA5507A006948EE /* Info.plist */,
 				88860A0B2EA0DF5C006948EE /* FilmEffect */,
 				88860A1D2EA0DF5E006948EE /* FilmEffectTests */,
 				88860A272EA0DF5E006948EE /* FilmEffectUITests */,
@@ -104,6 +102,7 @@
 		88860A0B2EA0DF5C006948EE /* FilmEffect */ = {
 			isa = PBXGroup;
 			children = (
+				88860A452EA554C5006948EE /* Info.plist */,
 				88860A0C2EA0DF5C006948EE /* FilmEffectApp.swift */,
 				88860A0E2EA0DF5C006948EE /* ContentView.swift */,
 				88860A102EA0DF5D006948EE /* Assets.xcassets */,
@@ -247,7 +246,6 @@
 			files = (
 				88860A152EA0DF5D006948EE /* Preview Assets.xcassets in Resources */,
 				88860A112EA0DF5D006948EE /* Assets.xcassets in Resources */,
-				88860A442EA5507A006948EE /* Info.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -438,6 +436,7 @@
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = FilmEffect/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = FilmEffect;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.business";
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
@@ -485,6 +484,7 @@
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = FilmEffect/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = FilmEffect;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.business";
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
