@@ -5,9 +5,10 @@
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>写真ライブラリに保存するためにアクセスが必要です。
 </string>
+	<key>NSPhotoLibraryAddUsageDescription</key>
+	<string>写真を読み込むためにアクセスが必要です。
+</string>
 	<key>CFBundleDocumentTypes</key>
-	<array>
-		<dict/>
-	</array>
+	<array/>
 </dict>
 </plist>

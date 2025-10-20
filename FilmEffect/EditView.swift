@@ -91,7 +91,6 @@ struct EditView: View {
         }
     }
 
-    // MARK: - 保存処理（コールバック付き）
     private func saveImageToPhotos() {
         guard let rendered = renderCombinedImage() else {
             saveError = "Failed to create image."
@@ -99,13 +98,25 @@ struct EditView: View {
             return
         }
     
-        UIImageWriteToSavedPhotosAlbum(rendered, nil) { _, error in
-            if let error = error {
-                saveError = error.localizedDescription
-            } else {
-                saveError = nil
+        // 写真ライブラリの権限確認
+        PHPhotoLibrary.requestAuthorization(for: .addOnly) { status in
+            DispatchQueue.main.async {
+                switch status {
+                case .authorized, .limited:
+                    UIImageWriteToSavedPhotosAlbum(rendered, nil, nil, nil)
+                    saveError = nil
+                    showSaveAlert = true
+                case .denied, .restricted:
+                    saveError = "写真ライブラリのアクセスが拒否されています。設定から許可してください。"
+                    showSaveAlert = true
+                case .notDetermined:
+                    // 初回はリクエスト後、次回以降は自動で上記に分岐
+                    break
+                @unknown default:
+                    saveError = "不明なエラーが発生しました。"
+                    showSaveAlert = true
+                }
             }
-            showSaveAlert = true
         }
     }
 
