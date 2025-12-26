@@ -185,7 +185,7 @@ struct EditView: View {
             // 元画像
             image.draw(in: CGRect(origin: .zero, size: image.size))
     
-            let ratio: CGFloat = 1 / 15
+            let ratio: CGFloat = 1 / 20
     
             if whiteFrameType == .horizontal {
                 let h = image.size.height * ratio
