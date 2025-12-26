@@ -29,32 +29,51 @@ struct EditView: View {
                 let aspect = image.size.width / image.size.height
 
                 ZStack {
-                    // 白背景（枠用）
-                    Color.white
+                    // 元画像（縮小しない）
+                    Image(uiImage: image)
+                        .resizable()
+                        .aspectRatio(aspect, contentMode: .fit)
                 
                     GeometryReader { geo in
-                        let frameRatio: CGFloat = 1 / 15   // ← 横幅の1/15
-                        let width = geo.size.width
-                        let height = geo.size.height
+                        let ratio: CGFloat = 1 / 15
+                        let w = geo.size.width
+                        let h = geo.size.height
                 
-                        let insetX = whiteFrameType == .vertical ? width * frameRatio : 0
-                        let insetY = whiteFrameType == .horizontal ? height * frameRatio : 0
+                        if whiteFrameType == .horizontal {
+                            VStack {
+                                Color.white
+                                    .frame(height: h * ratio)
                 
-                        Image(uiImage: image)
-                            .resizable()
-                            .aspectRatio(aspect, contentMode: .fit)
-                            .padding(.horizontal, insetX)
-                            .padding(.vertical, insetY)
+                                Spacer()
+                
+                                Color.white
+                                    .frame(height: h * ratio)
+                            }
+                        }
+                
+                        if whiteFrameType == .vertical {
+                            HStack {
+                                Color.white
+                                    .frame(width: w * ratio)
+                
+                                Spacer()
+                
+                                Color.white
+                                    .frame(width: w * ratio)
+                            }
+                        }
                     }
+                    .allowsHitTesting(false)
                 
-                    // 既存の画像フレーム
+                    // 既存フレーム画像
                     if let frameName = selectedFrame {
                         Image(frameName)
                             .resizable()
                             .aspectRatio(aspect, contentMode: .fit)
                             .allowsHitTesting(false)
                     }
-}
+                }
+                .clipped()
                 .frame(width: geometry.size.width,
                        height: geometry.size.width / aspect)
                 .clipped()
@@ -163,24 +182,38 @@ struct EditView: View {
         let renderer = UIGraphicsImageRenderer(size: image.size)
     
         return renderer.image { _ in
-            // 背景を白で塗る
-            UIColor.white.setFill()
-            UIRectFill(CGRect(origin: .zero, size: image.size))
+            // 元画像
+            image.draw(in: CGRect(origin: .zero, size: image.size))
     
-            let frameRatio: CGFloat = 1 / 15
-            let insetX = whiteFrameType == .vertical ? image.size.width * frameRatio : 0
-            let insetY = whiteFrameType == .horizontal ? image.size.height * frameRatio : 0
+            let ratio: CGFloat = 1 / 15
     
-            let drawRect = CGRect(
-                x: insetX,
-                y: insetY,
-                width: image.size.width - insetX * 2,
-                height: image.size.height - insetY * 2
-            )
+            if whiteFrameType == .horizontal {
+                let h = image.size.height * ratio
     
-            image.draw(in: drawRect)
+                UIColor.white.setFill()
+                UIRectFill(CGRect(x: 0, y: 0, width: image.size.width, height: h))
+                UIRectFill(CGRect(
+                    x: 0,
+                    y: image.size.height - h,
+                    width: image.size.width,
+                    height: h
+                ))
+            }
     
-            // 既存フレームを重ねる
+            if whiteFrameType == .vertical {
+                let w = image.size.width * ratio
+    
+                UIColor.white.setFill()
+                UIRectFill(CGRect(x: 0, y: 0, width: w, height: image.size.height))
+                UIRectFill(CGRect(
+                    x: image.size.width - w,
+                    y: 0,
+                    width: w,
+                    height: image.size.height
+                ))
+            }
+    
+            // 既存フレーム
             if let frameName = selectedFrame,
                let overlay = UIImage(named: frameName) {
                 overlay.draw(in: CGRect(origin: .zero, size: image.size))
