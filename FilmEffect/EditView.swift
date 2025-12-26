@@ -8,11 +8,18 @@
 import SwiftUI
 import Photos
 
+enum WhiteFrameType {
+    case none
+    case vertical   // 左右に白枠
+    case horizontal // 上下に白枠
+}
+
 struct EditView: View {
     let image: UIImage
     @State private var selectedFrame: String? = nil
     @State private var showSaveAlert = false
     @State private var saveError: String? = nil
+    @State private var whiteFrameType: WhiteFrameType = .none
 
     let frames = ["frame01", "frame02"]
 
@@ -22,19 +29,32 @@ struct EditView: View {
                 let aspect = image.size.width / image.size.height
 
                 ZStack {
-                    // 背景画像
-                    Image(uiImage: image)
-                        .resizable()
-                        .aspectRatio(aspect, contentMode: .fit)
-
-                    // フレーム
+                    // 白背景（枠用）
+                    Color.white
+                
+                    GeometryReader { geo in
+                        let frameRatio: CGFloat = 1 / 15   // ← 横幅の1/15
+                        let width = geo.size.width
+                        let height = geo.size.height
+                
+                        let insetX = whiteFrameType == .vertical ? width * frameRatio : 0
+                        let insetY = whiteFrameType == .horizontal ? height * frameRatio : 0
+                
+                        Image(uiImage: image)
+                            .resizable()
+                            .aspectRatio(aspect, contentMode: .fit)
+                            .padding(.horizontal, insetX)
+                            .padding(.vertical, insetY)
+                    }
+                
+                    // 既存の画像フレーム
                     if let frameName = selectedFrame {
                         Image(frameName)
                             .resizable()
                             .aspectRatio(aspect, contentMode: .fit)
                             .allowsHitTesting(false)
                     }
-                }
+}
                 .frame(width: geometry.size.width,
                        height: geometry.size.width / aspect)
                 .clipped()
@@ -47,6 +67,22 @@ struct EditView: View {
                 )
             }
             .padding()
+            
+            // 白枠フレーム選択
+            HStack(spacing: 16) {
+                Button("白枠なし") {
+                    whiteFrameType = .none
+                }
+            
+                Button("縦白枠") {
+                    whiteFrameType = .vertical
+                }
+            
+                Button("横白枠") {
+                    whiteFrameType = .horizontal
+                }
+            }
+            .padding(.top, 10)
 
             // フレーム選択ボタン群
             ScrollView(.horizontal, showsIndicators: false) {
@@ -125,13 +161,29 @@ struct EditView: View {
     // MARK: - 合成画像を生成
     private func renderCombinedImage() -> UIImage? {
         let renderer = UIGraphicsImageRenderer(size: image.size)
-        return renderer.image { context in
-            // 背景
-            image.draw(in: CGRect(origin: .zero, size: image.size))
-
-            // フレームを重ねる
-            if let frameName = selectedFrame, let overlay = UIImage(named: frameName) {
-                overlay.draw(in: CGRect(origin: .zero, size: image.size), blendMode: .normal, alpha: 1.0)
+    
+        return renderer.image { _ in
+            // 背景を白で塗る
+            UIColor.white.setFill()
+            UIRectFill(CGRect(origin: .zero, size: image.size))
+    
+            let frameRatio: CGFloat = 1 / 15
+            let insetX = whiteFrameType == .vertical ? image.size.width * frameRatio : 0
+            let insetY = whiteFrameType == .horizontal ? image.size.height * frameRatio : 0
+    
+            let drawRect = CGRect(
+                x: insetX,
+                y: insetY,
+                width: image.size.width - insetX * 2,
+                height: image.size.height - insetY * 2
+            )
+    
+            image.draw(in: drawRect)
+    
+            // 既存フレームを重ねる
+            if let frameName = selectedFrame,
+               let overlay = UIImage(named: frameName) {
+                overlay.draw(in: CGRect(origin: .zero, size: image.size))
             }
         }
     }
