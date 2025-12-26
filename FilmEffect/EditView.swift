@@ -35,7 +35,7 @@ struct EditView: View {
                         .aspectRatio(aspect, contentMode: .fit)
                 
                     GeometryReader { geo in
-                        let ratio: CGFloat = 1 / 15
+                        let ratio: CGFloat = 1 / 40
                         let w = geo.size.width
                         let h = geo.size.height
                 
